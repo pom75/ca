@@ -5,6 +5,7 @@ open Env_trans;;
 open Langinter;;
 let compiler_name = ref "ml2mips";;
 let object_suffix = ref ".s";;
+let count = ref 0;;
 
 (* des valeurs pour certains symboles de env_trans *)
 pair_symbol:=",";;
@@ -143,8 +144,7 @@ let rec string_of_type typ = match typ with
 let prod_global_var instr = match instr with
    VAR(v,t)   -> out_start  (v^ ":") 1                    (* global variable *)
   | FUNCTION (ns,t1,ar,(p,t2), instr) ->
-      (*out_start ("static MLvalue "(*"fun_"^ns^" "*)^ns^"= new MLfun_"^ns^"("^(string_of_int ar)^");") 1*)
-      out_start (" # what do we need to do with functions") 1
+      out_start (" # we dont have functions") 1
   | _ -> ()
 ;;
 let prod_two  ast_li = 
@@ -155,7 +155,8 @@ let get_param_type lv =
               | _ -> failwith "get_param_type" ) lv;;
 
 let prod_const c = match c with 
-    INT i -> out ("lol("^(string_of_int i)^")")
+    INT i -> out ("li $s"^(string_of_int count)^" "^(string_of_int i)); (*il faut un variable global*)
+            (* count = count + 1 need to check this*)
   | FLOAT f -> out ("new MLdouble("^(string_of_float f)^")")
   | BOOL b  -> out ("new MLbool("^(if b then "true" else "false")^")")
   | STRING s -> out ("new MLstring("^"\""^s^"\""^")")
@@ -165,10 +166,13 @@ let prod_const c = match c with
 let rec prod_local_var (fr,sd,nb) (v,t) = 
   out_start ("MLvalue "(*(string_of_type t)*)^v^";") nb;;
 
-let rec prod_instr (fr,sd,nb) instr  = match instr with 
-    CONST c -> out_before (fr,sd,nb);
+let rec prod_instr (fr,sd,nb) instr  = 
+match instr with 
+    CONST c -> 
+      (*out_before (fr,sd,nb);*)
+      out("\n");   (*just for now*)
       prod_const c;
-      out_after (fr,sd,nb)
+      (*out_after (fr,sd,nb)*)
   | VAR (v,t)
     -> if (nb = 0) && ( sd = "") then ()
     else 
@@ -189,14 +193,14 @@ let rec prod_instr (fr,sd,nb) instr  = match instr with
       prod_instr (fr,sd,nb+1) i3
   | RETURN i -> prod_instr (true,"",nb) i
   | AFFECT (v,i) -> prod_instr (false,v,nb) i
-  | BLOCK(l,i) -> out_start "{ " nb;
-      List.iter (fun (v,t,i) -> prod_local_var (false,"",nb+1) 
-                   (v,t)) l;
-      List.iter (fun (v,t,i) -> prod_instr (false,v,nb+1) i) l;
-      prod_instr (fr,sd,nb+1) i;
-      out_start "}" nb
+  | BLOCK(l,i) -> 
+      (*List.iter (fun (v,t,i) -> prod_local_var (false,"",nb+1) 
+                   (v,t)) l;*)  (*remove it since no need to declare variables *)
+      List.iter (fun (v,t,i) -> prod_instr (false,v,nb+2) i) l;
+      prod_instr (fr,sd,nb+1) i; 
+      (*out_start "}" nb*) (*no more brackets needed *)
         
-  | APPLY(i1,i2) -> 
+  | APPLY(i1,i2) ->
       out_before(fr,sd,nb);
       out ("((MLfun)");
       prod_instr (false,"",nb) i1;
@@ -248,13 +252,11 @@ let prod_invoke cn  ar =
 ;;
 
 let prod_invoke_fun cn ar t lp instr = 
-  (*out_start "MLvalue invoke_real(" 1;
-  out ("MLvalue "^(List.hd lp));
-  List.iter (fun x -> out (", MLvalue "^x)) (List.tl lp);
-  out_line ") {";*)
+  (* adding the start up of whatever method *)
+  out_line (" addiu $29 $29 NUM"); (*should know the number somehow*)
+  out_line ("more stuff to be added");
   prod_instr (true,"",2) instr;
   
-  out_start "}" 1;
   out_line ""
 ;;
 
@@ -269,8 +271,6 @@ let prod_fun instr = match instr with
 	(*prod_invoke class_name ar;
 	out_line "";*)
 	prod_invoke_fun class_name ar t1 lp instr;
-	out_line "";           
-	out_line "}";
 	out_line ("// fin de la classe "^class_name)
 	  
 	  
