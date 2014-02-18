@@ -82,13 +82,13 @@ let out_after  (fr,sd,nb) =
 let header_main  s = 
   List.iter out 
     ["\n";
-     " # "^ s ^ ".mips" ^ " engendre par ml2mips \n";
+     " # "^ s ^ ".s" ^ " engendre par ml2mips \n";
      "\n"]
 ;;
 
 let footer_main  s = 
   List.iter out
-    ["# fin du fichier " ^ s ^ ".mips\n"]
+    ["# fin du fichier " ^ s ^ ".s\n"]
 ;;
 let header_one  s = 
   List.iter out
@@ -155,8 +155,8 @@ let get_param_type lv =
               | _ -> failwith "get_param_type" ) lv;;
 
 let prod_const c = match c with 
-    INT i -> out ("new MLint("^(string_of_int i)^")")
-  | FLOAT f -> out ("new M+Ldouble("^(string_of_float f)^")")
+    INT i -> out ("lol("^(string_of_int i)^")")
+  | FLOAT f -> out ("new MLdouble("^(string_of_float f)^")")
   | BOOL b  -> out ("new MLbool("^(if b then "true" else "false")^")")
   | STRING s -> out ("new MLstring("^"\""^s^"\""^")")
   | EMPTYLIST -> out ("MLruntime.MLnil")
@@ -248,30 +248,26 @@ let prod_invoke cn  ar =
 ;;
 
 let prod_invoke_fun cn ar t lp instr = 
-  out_start "MLvalue invoke_real(" 1;
+  (*out_start "MLvalue invoke_real(" 1;
   out ("MLvalue "^(List.hd lp));
   List.iter (fun x -> out (", MLvalue "^x)) (List.tl lp);
-  out_line ") {";
+  out_line ") {";*)
   prod_instr (true,"",2) instr;
   
   out_start "}" 1;
   out_line ""
 ;;
 
+
+(* class just need to save the name to be associate it to the functions *)
 let prod_fun instr = match instr with 
     FUNCTION (ns,t1,ar,(lp,t2),instr) -> 
       let class_name = "MLfun_"^ns in
 	fun_header ns class_name ;
-	out_line ("class "^class_name^" extends MLfun {");
-	out_line "";
-	out_line ("  private static int MAX = "^(string_of_int ar)^";") ;
-	out_line "";
-	out_line ("  "^class_name^"() {super();}") ;
-	out_line "";
-	out_line ("  "^class_name^"(int n) {super(n);}") ;      
-	out_line "";
-	prod_invoke class_name ar;
-	out_line "";
+	out_line (class_name^":");
+	
+	(*prod_invoke class_name ar;
+	out_line "";*)
 	prod_invoke_fun class_name ar t1 lp instr;
 	out_line "";           
 	out_line "}";

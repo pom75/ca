@@ -1,5 +1,5 @@
 
- # fib.mips engendre par ml2mips 
+ # fib.s engendre par ml2mips 
 
 
 
@@ -7,23 +7,7 @@
  *  de'claration de la fonction fib___1
  *    vue comme la classe : MLfun_fib___1
  */ 
-class MLfun_fib___1 extends MLfun {
-
-  private static int MAX = 1;
-
-  MLfun_fib___1() {super();}
-
-  MLfun_fib___1(int n) {super(n);}
-
-  public MLvalue invoke(MLvalue MLparam){
-    if (MLcounter == (MAX-1)) {
-      return invoke_real(MLparam);
-    }
-    else {
-      MLfun_fib___1 l = new MLfun_fib___1(MLcounter+1);l.MLaddenv(MLenv,MLparam); return l;
-    }
-  }
-
+MLfun_fib___1:
 
   MLvalue invoke_real(MLvalue x___2) {
 
@@ -33,13 +17,13 @@ class MLfun_fib___1 extends MLfun {
         MLvalue T___4;
         MLvalue T___5;
         T___4=x___2;
-        T___5=new MLint(2);
+        T___5=lol(2);
         T___3=MLruntime.MLltint( (MLint )T___4,(MLint )T___5);
       }
       if (((MLbool)T___3).MLaccess())
         { 
           MLvalue T___6;
-          T___6=new MLint(1);
+          T___6=lol(1);
           return T___6;
         }
       else
@@ -56,7 +40,7 @@ class MLfun_fib___1 extends MLfun {
                 MLvalue T___11;
                 MLvalue T___12;
                 T___11=x___2;
-                T___12=new MLint(1);
+                T___12=lol(1);
                 T___10=MLruntime.MLsubint( (MLint )T___11,(MLint )T___12);
               }
               T___8=((MLfun)T___9).invoke(T___10);
@@ -69,7 +53,7 @@ class MLfun_fib___1 extends MLfun {
                 MLvalue T___16;
                 MLvalue T___17;
                 T___16=x___2;
-                T___17=new MLint(2);
+                T___17=lol(2);
                 T___15=MLruntime.MLsubint( (MLint )T___16,(MLint )T___17);
               }
               T___13=((MLfun)T___14).invoke(T___15);
@@ -97,7 +81,7 @@ main:
   MLvalue T___19;
   MLvalue T___20;
   T___19=fib.fib___1;
-  T___20=new MLint(5);
+  T___20=lol(5);
   value___18=((MLfun)T___19).invoke(T___20);
 }
 { 
@@ -105,4 +89,4 @@ main:
   bidon___21=MLruntime.MLlrp;
   bidon___21=MLruntime.MLprint( (MLvalue )value___18);
 }
-# fin du fichier fib.mips
+# fin du fichier fib.s
