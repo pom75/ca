@@ -9,7 +9,7 @@ CAMLLINK=$(CAMLC) -o
 CAMLLEX=ocamllex
 CAMLYACC=ocamlyacc
 CAMLDEP=ocamldep
-NAME=java
+NAME=mips
 
 CIBLES=intertypeur intereval ml2$(NAME)
 
