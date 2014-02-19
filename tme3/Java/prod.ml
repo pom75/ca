@@ -155,9 +155,10 @@ let get_param_type lv =
               | _ -> failwith "get_param_type" ) lv;;
 
 let prod_const c = match c with 
-    INT i -> out ("li $s"^(string_of_int count)^" "^(string_of_int i)); (*il faut un variable global*)
-            (* count = count + 1 need to check this*)
+    INT i -> out ("li $s"^(string_of_int !count)^" "^(string_of_int i));
+            count := !count + 1
   | FLOAT f -> out ("new MLdouble("^(string_of_float f)^")")
+
   | BOOL b  -> out ("new MLbool("^(if b then "true" else "false")^")")
   | STRING s -> out ("new MLstring("^"\""^s^"\""^")")
   | EMPTYLIST -> out ("MLruntime.MLnil")
@@ -196,8 +197,10 @@ match instr with
   | BLOCK(l,i) -> 
       (*List.iter (fun (v,t,i) -> prod_local_var (false,"",nb+1) 
                    (v,t)) l;*)  (*remove it since no need to declare variables *)
+      let x = List.length l in
+	out(string_of_int x);
       List.iter (fun (v,t,i) -> prod_instr (false,v,nb+2) i) l;
-      prod_instr (fr,sd,nb+1) i; 
+       prod_instr (fr,sd,nb+1) i;
       (*out_start "}" nb*) (*no more brackets needed *)
         
   | APPLY(i1,i2) ->

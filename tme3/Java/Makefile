@@ -35,7 +35,7 @@ ml2$(NAME): $(IOBJS) alex.ml asyn.ml alex.cmi asyn.cmi $(TOBJS) $(COBJS)
 
 java: prodjava.ml
 	rm prod.ml
-	ln -s prodjava.ml prod.ml
+	ln -s -annot prodjava.ml prod.ml
 
 distrib:
 	tar -cvf distrib.tar $(SRCS) alex.mll  asyn.mly asyn.mli Makefile alex.mll alex.mli asyn.mly asyn.mli prodjava.ml maincomp.ml runtime.java Makefile
@@ -46,7 +46,7 @@ distrib:
 .SUFFIXES: .mll .mly .ml .mli .cmo .cmi 
 
 .ml.cmo:
-	$(CAMLC) -c $<
+	$(CAMLC) -annot -c $<
 
 .mli.cmi:
 	$(CAMLC) -c $<
@@ -58,7 +58,7 @@ distrib:
 	$(CAMLLEX) $<
 
 clean:
-	/bin/rm -f *~ *.cmi *.cmo alex.ml asyn.ml $(CIBLE)
+	/bin/rm -f *~ *.cmi *.cmo *.annot alex.ml asyn.ml $(CIBLE)
 
 
 depend:
